@@ -187,6 +187,8 @@ def evaluate(model, test_loader, result_folder):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("source_folder", type=str)
+    parser.add_argument("target_folder", type=str)
+    parser.add_argument("temp_folder", type=str)
     parser.add_argument("max_seqlen", type=int, default=512)
     parser.add_argument("result_folder", type=str)
     parser.add_argument("epochs", type=int)
@@ -212,23 +214,26 @@ if __name__ == '__main__':
                        fix_length=args.max_seqlen, pad_token=PAD_INDEX, unk_token=UNK_INDEX)
     # save the converted file to the source folder
     fields = [('post_text', text_field), ('label', label_field)]
-    # read file from source folder
+    # read training and validation data from source folder
     traincsv = pd.read_csv("%s/train.csv" % args.source_folder, sep="\t")
     valcsv = pd.read_csv("%s/val.csv" % args.source_folder, sep="\t")
-    testcsv = pd.read_csv("%s/test.csv" % args.source_folder, sep="\t")
 
-    # select only text and label column and save to the tsv file
+    # read test data from target folder
+    testcsv = pd.read_csv("%s/test.csv" % args.target_folder, sep="\t")
+
+    # select only text and label column and save to the tsv file in a temporary directory
     traincsv = traincsv[["post_text", "label"]]
     valcsv = valcsv[["post_text", "label"]]
     testcsv = testcsv[["post_text", "label"]]
 
-    traincsv.to_csv("%s/train.tsv" % args.source_folder, sep="\t", index=False)
-    valcsv.to_csv("%s/val.tsv" % args.source_folder, sep="\t", index=False)
-    testcsv.to_csv("%s/test.tsv" % args.source_folder, sep="\t", index=False)
+    traincsv.to_csv("%s/train.tsv" % args.temp_folder, sep="\t", index=False)
+    valcsv.to_csv("%s/val.tsv" % args.temp_folder, sep="\t", index=False)
+
+    testcsv.to_csv("%s/test.tsv" % args.temp_folder, sep="\t", index=False)
 
     # TabularDataset: load from the tsv file from source folder
 
-    train_data, valid, test = TabularDataset.splits(path=args.source_folder, train='train.tsv',
+    train_data, valid, test = TabularDataset.splits(path=args.temp_folder, train='train.tsv',
                                                     validation='val.tsv',
                                                     test='test.tsv', format='TSV', fields=fields,
                                                     skip_header=True)

@@ -13,9 +13,9 @@ def build_vocabulary():
     """Read all datasets and build the vocabulary of the top 5000 words using all datasets as corpus."""
     print("retrieve most frequent words ...")
     nlp = spacy.load("en_core_web_sm")
-    data1 = pd.read_csv("europolis+/europolis_all_features.csv", sep="\t")
-    data2 = pd.read_csv("cmv+/cmv_all_features.csv", sep="\t")
-    data3 = pd.read_csv("regroom+/regroom_all_features.csv", sep="\t")
+    data1 = pd.read_csv("datasets/europolis_all_features.csv", sep="\t")
+    data2 = pd.read_csv("datasets/cmv_all_features.csv", sep="\t")
+    data3 = pd.read_csv("datasets/regroom_all_features.csv", sep="\t")
     all_comments = list(data1.post_text) + list(data2.post_text) + list(data3.post_text)
     words = []
     for doc in nlp.pipe(all_comments, disable=["parser"]):
@@ -102,7 +102,7 @@ def train_bow_onefold(training_path, test_path, prediction_path):
     train = pd.read_csv("%s/train.csv" % training_path, sep="\t")
     reports_forest = []
     for i in range(0, 10):
-        test = pd.read_csv("%s/split%i/test.csv" % (test_path, i), sep="\t")
+        test = pd.read_csv("%s/split%d/test.csv" % (test_path, i), sep="\t")
         outfile = "%s/split%d/predictions.csv" % (prediction_path, i)
         forest_report = train_run(predictions_path=outfile, train=train, test=test)
         reports_forest.append(forest_report)
@@ -120,7 +120,7 @@ def train_bow_10fold(training_path, test_path, prediction_path):
     reports_forest = []
     for i in range(0, 10):
         train = pd.read_csv("%s/split%d/train.csv" % (training_path, i), sep="\t")
-        test = pd.read_csv("%s/split%i/test.csv" % (test_path, i), sep="\t")
+        test = pd.read_csv("%s/split%d/test.csv" % (test_path, i), sep="\t")
         outfile = "%s/split%d/predictions.csv" % (prediction_path, i)
         forest_report = train_run(predictions_path=outfile, train=train, test=test)
         reports_forest.append(forest_report)

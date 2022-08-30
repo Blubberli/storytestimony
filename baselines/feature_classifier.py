@@ -1,7 +1,7 @@
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
 from sklearn.metrics import classification_report
-from bow_model import report_average
+from baselines.bow_model import report_average
 import random
 import argparse
 
@@ -41,7 +41,7 @@ def train_features_onefold(training_path, test_path, prediction_path):
     train = pd.read_csv("%s/train.csv" % training_path, sep="\t")
     reports_forest = []
     for i in range(0, 10):
-        test = pd.read_csv("%s/split%i/test.csv" % (test_path, i), sep="\t")
+        test = pd.read_csv("%s/split%d/test.csv" % (test_path, i), sep="\t")
         outfile = "%s/split%d/predictions.csv" % (prediction_path, i)
         forest_report = train_run(outfile, train, test)
         reports_forest.append(forest_report)
@@ -59,7 +59,7 @@ def train_features_10fold(training_path, test_path, prediction_path):
     reports_forest = []
     for i in range(0, 10):
         train = pd.read_csv("%s/split%d/train.csv" % (training_path, i), sep="\t")
-        test = pd.read_csv("%s/split%i/test.csv" % (test_path, i), sep="\t")
+        test = pd.read_csv("%s/split%d/test.csv" % (test_path, i), sep="\t")
         outfile = "%s/split%d/predictions.csv" % (prediction_path, i)
         forest_report = train_run(outfile, train, test)
         reports_forest.append(forest_report)
