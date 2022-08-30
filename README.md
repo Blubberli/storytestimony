@@ -22,3 +22,14 @@ python bert_classifier source_folder result_folder epochs gpu model_path --test
 - model_path: the LM name to load the pretrained LM to fine-tune
   - e.g. *bert-base-uncased*
 - --test: add this flag to create predictions for the test data
+
+## Regression Analysis
+
+The data and the code for the linear regression analysis can be found in `regression_analysis`.
+
+
+
+
+
+[1] [Reports of personal experiences and stories in argumentation: datasets and analysis Neele Falk and Gabriella Lapesa.
+Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). 2022.](https://aclanthology.org/2022.acl-long.379/)
