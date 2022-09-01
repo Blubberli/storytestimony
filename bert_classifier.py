@@ -22,7 +22,7 @@ class BERT(nn.Module):
     def __init__(self, model_path):
         super(BERT, self).__init__()
 
-        self.encoder = BertForSequenceClassification.from_pretrained(model_path)
+        self.encoder = AutoModelForSequenceClassification.from_pretrained(model_path)
         print("loaded bert model from %s" % model_path)
 
     def forward(self, text, label):
@@ -244,7 +244,7 @@ if __name__ == '__main__':
                                 device=device, train=True, sort=True, sort_within_batch=True)
     test_iter = Iterator(test, batch_size=16, device=device, train=False, shuffle=False, sort=False)
     # init bert model
-    model = AutoModelForSequenceClassification.from_pretrained(model_path).to(device)
+    model = BERT(model_path).to(device)
     # init optimizer
     optimizer = optim.Adam(model.parameters(), lr=2e-5)
     # retrieve the list of training labels
@@ -254,7 +254,7 @@ if __name__ == '__main__':
     train(model=model, optimizer=optimizer, train_loader=train_iter,
           valid_loader=valid_iter, destination_folder=args.result_folder, num_epochs=args.epochs)
     # load the best model after trained for max epochs
-    best_model = AutoModelForSequenceClassification.from_pretrained(model_path).to(device)
+    best_model = BERT(model_path).to(device)
     # load best model from checkpoint
     load_checkpoint(args.result_folder + '/model.pt', best_model)
     if args.test:
