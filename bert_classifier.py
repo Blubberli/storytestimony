@@ -244,7 +244,7 @@ if __name__ == '__main__':
                                 device=device, train=True, sort=True, sort_within_batch=True)
     test_iter = Iterator(test, batch_size=16, device=device, train=False, shuffle=False, sort=False)
     # init bert model
-    model = AutoModelForSequenceClassification.from_pretrained(model_path=model_path).to(device)
+    model = AutoModelForSequenceClassification.from_pretrained(model_path).to(device)
     # init optimizer
     optimizer = optim.Adam(model.parameters(), lr=2e-5)
     # retrieve the list of training labels
