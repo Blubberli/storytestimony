@@ -7,7 +7,7 @@ import argparse
 from torchtext.legacy.data import Field, TabularDataset, BucketIterator, Iterator
 
 import torch.nn as nn
-from transformers import BertTokenizer, BertForSequenceClassification
+from transformers import BertTokenizer, BertForSequenceClassification, AutoTokenizer, AutoModelForSequenceClassification
 
 import torch.optim as optim
 import random
@@ -19,10 +19,10 @@ np.random.seed(42)
 class BERT(nn.Module):
     """BERT model: returns the prediction and the cross-entropy loss. Is loaded from 'model path'"""
 
-    def __init__(self, config, model_path):
+    def __init__(self, model_path):
         super(BERT, self).__init__()
 
-        self.encoder = BertForSequenceClassification.from_pretrained(model_path, config=config)
+        self.encoder = BertForSequenceClassification.from_pretrained(model_path)
         print("loaded bert model from %s" % model_path)
 
     def forward(self, text, label):
@@ -199,11 +199,9 @@ if __name__ == '__main__':
     # GPU if available, otherwise CPU
     device = torch.device('cuda:%d' % args.gpu if torch.cuda.is_available() else 'cpu')
     # init the tokenizer that corresponds to the model
-    tokenizer_config = "%s/tokenizer_config.json" % args.model_path
-    model_config = "%s/config.json" % args.model_path
     model_path = "%s" % args.model_path
-    tokenizer = BertTokenizer.from_pretrained(model_path, config=tokenizer_config)
-    print("loaded tokenizer from %s" % tokenizer_config)
+    tokenizer = AutoTokenizer.from_pretrained(model_path)
+    print("loaded tokenizer from %s" % model_path)
 
     # encoding can be handled by torchtext
     PAD_INDEX = tokenizer.convert_tokens_to_ids(tokenizer.pad_token)
@@ -246,7 +244,7 @@ if __name__ == '__main__':
                                 device=device, train=True, sort=True, sort_within_batch=True)
     test_iter = Iterator(test, batch_size=16, device=device, train=False, shuffle=False, sort=False)
     # init bert model
-    model = BERT(config=model_config, model_path=model_path).to(device)
+    model = AutoModelForSequenceClassification.from_pretrained(model_path=model_path).to(device)
     # init optimizer
     optimizer = optim.Adam(model.parameters(), lr=2e-5)
     # retrieve the list of training labels
@@ -256,7 +254,7 @@ if __name__ == '__main__':
     train(model=model, optimizer=optimizer, train_loader=train_iter,
           valid_loader=valid_iter, destination_folder=args.result_folder, num_epochs=args.epochs)
     # load the best model after trained for max epochs
-    best_model = BERT(config=model_config, model_path=model_path).to(device)
+    best_model = AutoModelForSequenceClassification.from_pretrained(model_path).to(device)
     # load best model from checkpoint
     load_checkpoint(args.result_folder + '/model.pt', best_model)
     if args.test:
