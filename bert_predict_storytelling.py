@@ -78,7 +78,6 @@ if __name__ == '__main__':
     test_iter = Iterator(test, batch_size=16, device=device, train=False, shuffle=False, sort=False)
 
     model = BERT(args.classification_model).to(device)
-    load_checkpoint(args.model, model)
-    print("loaded best model from %s" % args.model)
+    print("loaded best model from %s" % args.classification_model)
     post_texts = list(testcsv[args.text_col])
     predict(model=model, test_loader=test_iter, result_folder=args.result_folder, post_texts=post_texts)

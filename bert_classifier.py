@@ -202,7 +202,6 @@ if __name__ == '__main__':
     model_path = "%s" % args.model_path
     tokenizer = AutoTokenizer.from_pretrained(model_path)
     print("loaded tokenizer from %s" % model_path)
-    print(tokenizer)
     # encoding can be handled by torchtext
     PAD_INDEX = tokenizer.convert_tokens_to_ids(tokenizer.pad_token)
     UNK_INDEX = tokenizer.convert_tokens_to_ids(tokenizer.unk_token)
