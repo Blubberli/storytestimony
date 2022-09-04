@@ -11,6 +11,7 @@ import numpy as np
 # Models
 
 from transformers import AutoTokenizer
+import torch.nn.functional as F
 from bert_classifier import BERT, load_checkpoint
 
 # Evaluation
@@ -20,13 +21,14 @@ random.seed(42)
 np.random.seed(42)
 
 
-def predict(model, test_loader, result_folder, post_texts):
-    y_pred = []
-    y_scores = []
-    predictions_path = result_folder + "/predictions.csv"
+def predict(model, test_loader, result_folder, test_set):
+    predicted_labels = []
+    predicted_probabilities = []
     model.eval()
     with torch.no_grad():
-        for (text, labels), _ in tqdm(test_loader):
+        for (text), _ in tqdm(test_loader):
+            current_batchsize = len(text)
+            labels = torch.ones(current_batchsize)
             labels = labels.type(torch.LongTensor)
             labels = labels.to(device)
             text = text.type(torch.LongTensor)
@@ -34,14 +36,17 @@ def predict(model, test_loader, result_folder, post_texts):
             output = model(text, labels)
 
             _, output = output
-            y_pred.extend(torch.argmax(output, 1).tolist())
-            y_scores.extend(torch.softmax(output, 1).tolist())
-    with open(predictions_path, "w") as f:
-        f.write("post_text\tpredicted_label\tprobability(storytelling)\n")
-        for i in range(len(y_pred)):
-            f.write(
-                str(post_texts[i]) + "\t" + str(y_pred[i]) + "\t" + str(y_scores[i]) + "\n")
-    f.close()
+            current_predicted_probs = F.softmax(torch.tensor(output).detach(), dim=-1).tolist()
+            current_predicted_labels = torch.argmax(output, 1).tolist()
+
+            predicted_labels.extend(current_predicted_labels)
+            predicted_probabilities.extend(current_predicted_probs)
+
+    predicted_probabilities = [el[1] for el in predicted_probabilities]
+    test_set["story_prob"] = predicted_probabilities
+    test_set["predicted_label"] = predicted_labels
+
+    test_set.to_csv("%s/predictions.csv" % result_folder, index=False, sep="\t")
 
 
 if __name__ == '__main__':
@@ -80,4 +85,4 @@ if __name__ == '__main__':
     model = BERT(args.classification_model).to(device)
     print("loaded best model from %s" % args.classification_model)
     post_texts = list(testcsv[args.text_col])
-    predict(model=model, test_loader=test_iter, result_folder=args.result_folder, post_texts=post_texts)
+    predict(model=model, test_loader=test_iter, result_folder=args.result_folder, test_set=testcsv)
