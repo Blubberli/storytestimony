@@ -68,21 +68,18 @@ if __name__ == '__main__':
 
     PAD_INDEX = tokenizer.convert_tokens_to_ids(tokenizer.pad_token)
     UNK_INDEX = tokenizer.convert_tokens_to_ids(tokenizer.unk_token)
-    label_field = Field(sequential=False, use_vocab=False, batch_first=True, dtype=torch.float)
     text_field = Field(use_vocab=False, tokenize=tokenizer.encode, lower=False, include_lengths=False,
                        batch_first=True,
-                       fix_length=args.max_seqlen, pad_token=PAD_INDEX, unk_token=UNK_INDEX)
-    testcsv = pd.read_csv(args.test_data, sep="\t")
-    testcsv = testcsv[[args.text_col]]
-    testcsv["label"] = [0] * len(testcsv)
-    testcsv.to_csv("tmp_test.tsv", sep="\t", index=False)
+                       fix_length=512, pad_token=PAD_INDEX, unk_token=UNK_INDEX)
+    fields = [(args.text_col, text_field)]
+    test_set = pd.read_csv(args.test_data, sep="\t")
 
-    fields = [('post_text', text_field), ('label', label_field)]
-
-    test = TabularDataset(path="tmp_test.tsv", format='TSV', fields=fields, skip_header=True)
+    test = TabularDataset(path=args.test_data, format='TSV', fields=fields, skip_header=True)
     test_iter = Iterator(test, batch_size=16, device=device, train=False, shuffle=False, sort=False)
+
+    print("loaded test dataset from %s" % args.test_data)
 
     model = BERT(args.classification_model).to(device)
     print("loaded best model from %s" % args.classification_model)
-    post_texts = list(testcsv[args.text_col])
+    post_texts = list(test_set[args.text_col])
     predict(model=model, test_loader=test_iter, result_folder=args.result_folder, test_set=testcsv)
