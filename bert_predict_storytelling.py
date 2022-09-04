@@ -35,7 +35,7 @@ def predict(model, test_loader, result_folder, post_texts):
 
             _, output = output
             y_pred.extend(torch.argmax(output, 1).tolist())
-            y_scores.extend(torch.softmax(output).tolist())
+            y_scores.extend(torch.softmax(output, 1).tolist())
     with open(predictions_path, "w") as f:
         f.write("post_text\tpredicted_label\tprobability(storytelling)\n")
         for i in range(len(y_pred)):
