@@ -82,4 +82,4 @@ if __name__ == '__main__':
     model = BERT(args.classification_model).to(device)
     print("loaded best model from %s" % args.classification_model)
     post_texts = list(test_set[args.text_col])
-    predict(model=model, test_loader=test_iter, result_folder=args.result_folder, test_set=testcsv)
+    predict(model=model, test_loader=test_iter, result_folder=args.result_folder, test_set=test_set)
