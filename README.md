@@ -25,12 +25,14 @@ python bert_classifier source_folder result_folder temp_folder epochs gpu model_
   - bert-based transfomer model, e.g. *bert-base-uncased*
 - --test: add this flag to create predictions for the test data
 
-The domain-adapted versions of the language model are also available. To load them use the following names as *model_path*:
+The domain-adapted versions of the language model are also available. For these, the underlying language model have been tuned on domain-specific data. 
+Note that if you load these, you still need to fine-tune them on the classification task. 
+To load them use the following names as *model_path*:
 - falkne/bert-europarl-en [link to hub](https://huggingface.co/falkne/bert-europarl-en)
 - falkne/bert-online-discussions-en [link to hub](https://huggingface.co/falkne/bert-online-discussions-en)
-- falkne/bert-mixed-discussions-europarl-online-en [link to hub](https://huggingface.co/falkne/bert-mixed-discussions-europarl-online-en)
+- falkne/bert-discussions-online-parliament-en [link to hub](https://huggingface.co/falkne/bert-mixed-discussions-europarl-online-en)
 ```
-python bert_classifier.py datasets/splits/cmv_10splits/split0/ datasets/splits/cmv_10splits/split0/ tmp/ 125 tmp/ 5 0 "roberta-base" --test
+python bert_classifier.py datasets/splits/cmv_10splits/split0/ datasets/splits/cmv_10splits/split0/ tmp/ 125 tmp/ 5 0 "falkne/bert-europarl-en" --test
 ```
 ## Regression Analysis
 
