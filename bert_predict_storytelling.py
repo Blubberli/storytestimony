@@ -10,9 +10,9 @@ import numpy as np
 
 # Models
 
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch.nn.functional as F
-from bert_classifier import BERT, load_checkpoint
+from bert_classifier import BERT
 
 # Evaluation
 
@@ -54,7 +54,6 @@ if __name__ == '__main__':
     parser.add_argument("test_data", type=str)
     parser.add_argument("text_col", type=str)
     parser.add_argument("max_seqlen", type=int)
-    parser.add_argument("model_path", type=str)
     parser.add_argument("classification_model", type=str)
     parser.add_argument("result_folder", type=str)
     parser.add_argument("gpu", type=int)
@@ -62,9 +61,7 @@ if __name__ == '__main__':
     # GPU if available, otherwise CPU
     device = torch.device('cuda:%d' % args.gpu if torch.cuda.is_available() else 'cpu')
     # init the tokenizer that corresponds to the model
-    model_path = "%s" % args.model_path
-    tokenizer = AutoTokenizer.from_pretrained(model_path)
-    print("loaded tokenizer from %s" % model_path)
+    tokenizer = AutoTokenizer.from_pretrained(args.classification_model)
 
     PAD_INDEX = tokenizer.convert_tokens_to_ids(tokenizer.pad_token)
     UNK_INDEX = tokenizer.convert_tokens_to_ids(tokenizer.unk_token)
@@ -78,8 +75,8 @@ if __name__ == '__main__':
     test_iter = Iterator(test, batch_size=16, device=device, train=False, shuffle=False, sort=False)
 
     print("loaded test dataset from %s" % args.test_data)
-
-    model = BERT(args.classification_model).to(device)
+    model = AutoModelForSequenceClassification.from_pretrained(args.classification_model).to(device)
+    model = BERT(encoder=model).to(device)
     print("loaded best model from %s" % args.classification_model)
     post_texts = list(test_set[args.text_col])
     predict(model=model, test_loader=test_iter, result_folder=args.result_folder, test_set=test_set)

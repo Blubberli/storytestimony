@@ -7,7 +7,7 @@ import argparse
 from torchtext.legacy.data import Field, TabularDataset, BucketIterator, Iterator
 
 import torch.nn as nn
-from transformers import BertTokenizer, BertForSequenceClassification, AutoTokenizer, AutoModelForSequenceClassification
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 import torch.optim as optim
 import random
@@ -16,14 +16,14 @@ random.seed(42)
 np.random.seed(42)
 
 
+# wrapper class for any transformer model to use the forward method
 class BERT(nn.Module):
     """BERT model: returns the prediction and the cross-entropy loss. Is loaded from 'model path'"""
 
-    def __init__(self, model_path):
+    def __init__(self, encoder):
         super(BERT, self).__init__()
 
-        self.encoder = AutoModelForSequenceClassification.from_pretrained(model_path)
-        print("loaded bert model from %s" % model_path)
+        self.encoder = encoder
 
     def forward(self, text, label):
         loss, text_fea = self.encoder(text, labels=label)[:2]
@@ -42,7 +42,7 @@ def save_checkpoint(save_path, model, valid_loss):
     print(f'Model saved to ==> {save_path}')
 
 
-def load_checkpoint(load_path, model):
+def load_checkpoint(load_path, model, device):
     if load_path == None:
         return
 
@@ -66,7 +66,7 @@ def save_metrics(save_path, train_loss_list, valid_loss_list, global_steps_list)
     print(f'Model saved to ==> {save_path}')
 
 
-def load_metrics(load_path):
+def load_metrics(load_path, device):
     if load_path == None:
         return
 
@@ -173,7 +173,7 @@ def evaluate(model, test_loader, result_folder):
             _, output = output
             y_pred.extend(torch.argmax(output, 1).tolist())
             y_true.extend(labels.tolist())
-            y_scores.extend(torch.sigmoid(output).tolist())
+            y_scores.extend(torch.softmax(output, 1).tolist())
     with open(predictions_path, "w") as f:
         f.write("gold label\tpredicted label\tprobability\n")
         for i in range(len(y_pred)):
@@ -243,7 +243,8 @@ if __name__ == '__main__':
                                 device=device, train=True, sort=True, sort_within_batch=True)
     test_iter = Iterator(test, batch_size=16, device=device, train=False, shuffle=False, sort=False)
     # init bert model
-    model = BERT(model_path).to(device)
+    encoder = AutoModelForSequenceClassification.from_pretrained(model_path)
+    model = BERT(encoder).to(device)
     # init optimizer
     optimizer = optim.Adam(model.parameters(), lr=2e-5)
     # retrieve the list of training labels
@@ -253,9 +254,9 @@ if __name__ == '__main__':
     train(model=model, optimizer=optimizer, train_loader=train_iter,
           valid_loader=valid_iter, destination_folder=args.result_folder, num_epochs=args.epochs)
     # load the best model after trained for max epochs
-    best_model = BERT(model_path).to(device)
+    best_model = BERT(encoder).to(device)
     # load best model from checkpoint
-    load_checkpoint(args.result_folder + '/model.pt', best_model)
+    load_checkpoint(args.result_folder + '/model.pt', best_model, device)
     if args.test:
         # evaluate the model on the test set
         report = evaluate(best_model, test_iter, args.result_folder)
