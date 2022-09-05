@@ -34,6 +34,25 @@ To load them use the following names as *model_path*:
 ```
 python bert_classifier.py datasets/splits/cmv_10splits/split0/ datasets/splits/cmv_10splits/split0/ tmp/ 125 tmp/ 5 0 "falkne/bert-europarl-en" --test
 ```
+
+## Inference
+To use a trained model for inference you just need a dataset you want to create predictions for. The dataset shoul have a column-based format, the only required column
+is the one that stores the textual input. You can use the script *bert_predict_storytelling.py* to create predictions.
+Four fine-tuned classification models are made available via the hub. Alternatively you can first train your own model and use it for predictions.
+The following models can be used directly from the hub
+- falkne/storytelling-europolis-en
+- falkne/storytelling-regulationroom-en
+- falkne/storytelling-change-my-view-en
+- falkne/storytelling-mixed-domains-en
+  - This model was trained on all three available datasets. It is the most robust model if you work with diverse domains.
+- falkne/storytelling-LM-europarl-mixed-en
+  - this model was trained on all available datasets. the underlying LM was fine-tuned on europarl. This model got the best results in the paper.
+
+For example you want to create predictions for CMV data, you also want to evaluate the model (possible if you have some gold labels) and you want
+to use the model trained on regulationroom:
+```
+python bert_predict_storytelling.py datasets/splits/cmv_10splits/split0/test.tsv "post_text" 512 "falkne/storytelling-regulationroom-en" test_results/ 0 --gold_label_col "label"
+```
 ## Regression Analysis
 
 The data and the code for the linear regression analysis can be found in `regression_analysis`.
