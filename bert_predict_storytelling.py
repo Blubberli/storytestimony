@@ -62,7 +62,7 @@ if __name__ == '__main__':
     parser.add_argument("result_folder", type=str,
                         help="path to the folder where the results (predictions) will be stored")
     parser.add_argument("gpu", type=int)
-    parser.add_argument("--gold_label_col", type=str,
+    parser.add_argument("--gold_label_col", type=str, required=False,
                         help="if available you can specific the column name of the gold labels to compute evaluation metrics.")
     args = parser.parse_args()
     # GPU if available, otherwise CPU
