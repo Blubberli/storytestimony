@@ -1,5 +1,7 @@
 # datasets 
-## : used to predict arguments containing narratives and experiences
+## used to predict arguments containing narratives and experiences
+
+The three complete datasets can be found in `whole_datasets.zip`.
 
 Every dataset contains a column *label* which represents the binary classification into whether an argumentative text contains a story / personal experience (1) or not (0).
 The labels from the original datasets were called __testimony__ (CMV, RegRoom) and __storytelling__ (Europolis).
@@ -32,7 +34,7 @@ Europolis was annotated with __storytelling__.
 
 ## usage
 
-If you use any of the annotated datasets please do not forget to cite the corresponding references:
+<b>If you use any of the annotated datasets please do not forget to cite the corresponding references:</b>
 
 [1] Ryo Egawa, Gaku Morio, and Katsuhide Fujita. 2019.
 Annotating and analyzing semantic role of elementary units and relations in online persuasive arguments. In Proceedings of the 57th Annual Meet- ing of the Association for Computational Linguistics: Student Research Workshop, pages 422–428, Florence, Italy. Association for Computational Linguistics.
