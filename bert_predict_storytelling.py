@@ -7,6 +7,7 @@ from tqdm import tqdm
 from torchtext.legacy.data import Field, TabularDataset, BucketIterator, Iterator
 import random
 import numpy as np
+from sklearn.metrics import classification_report
 
 # Models
 
@@ -47,16 +48,22 @@ def predict(model, test_loader, result_folder, test_set):
     test_set["predicted_label"] = predicted_labels
 
     test_set.to_csv("%s/predictions.csv" % result_folder, index=False, sep="\t")
+    return predicted_labels
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("test_data", type=str)
-    parser.add_argument("text_col", type=str)
-    parser.add_argument("max_seqlen", type=int)
-    parser.add_argument("classification_model", type=str)
-    parser.add_argument("result_folder", type=str)
+    parser.add_argument("test_data", type=str,
+                        help="the path to the test dataset, csv/tsv format, default seperator is TAB")
+    parser.add_argument("text_col", type=str, help="the name of the column that holds the textual input")
+    parser.add_argument("max_seqlen", type=int, default=125)
+    parser.add_argument("classification_model", type=str,
+                        help="model identifier from hub, needs to be a model trained on storytelling")
+    parser.add_argument("result_folder", type=str,
+                        help="path to the folder where the results (predictions) will be stored")
     parser.add_argument("gpu", type=int)
+    parser.add_argument("--gold_label_col", type=str,
+                        help="if available you can specific the column name of the gold labels to compute evaluation metrics.")
     args = parser.parse_args()
     # GPU if available, otherwise CPU
     device = torch.device('cuda:%d' % args.gpu if torch.cuda.is_available() else 'cpu')
@@ -79,4 +86,6 @@ if __name__ == '__main__':
     model = BERT(encoder=model).to(device)
     print("loaded best model from %s" % args.classification_model)
     post_texts = list(test_set[args.text_col])
-    predict(model=model, test_loader=test_iter, result_folder=args.result_folder, test_set=test_set)
+    predicted_labels = predict(model=model, test_loader=test_iter, result_folder=args.result_folder, test_set=test_set)
+    if args.gold_label_col:
+        print(classification_report(y_true=test_set[args.gold_label_col].values, y_pred=predicted_labels))
