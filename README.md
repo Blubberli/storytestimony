@@ -28,22 +28,21 @@ python bert_classifier source_folder result_folder temp_folder epochs gpu model_
 The domain-adapted versions of the language model are also available. For these, the underlying language model have been tuned on domain-specific data. 
 Note that if you load these, you still need to fine-tune them on the classification task. 
 To load them use the following names as *model_path*:
-- falkne/bert-europarl-en [link to hub](https://huggingface.co/falkne/bert-europarl-en)
-- falkne/bert-online-discussions-en [link to hub](https://huggingface.co/falkne/bert-online-discussions-en)
-- falkne/bert-discussions-online-parliament-en [link to hub](https://huggingface.co/falkne/bert-mixed-discussions-europarl-online-en)
+- *falkne/bert-europarl-en* [link to hub](https://huggingface.co/falkne/bert-europarl-en)
+- *falkne/bert-online-discussions-en* [link to hub](https://huggingface.co/falkne/bert-online-discussions-en)
+- *falkne/bert-discussions-online-parliament-en* [link to hub](https://huggingface.co/falkne/bert-mixed-discussions-europarl-online-en)
 ```
 python bert_classifier.py datasets/splits/cmv_10splits/split0/ datasets/splits/cmv_10splits/split0/ tmp/ 125 tmp/ 5 0 "falkne/bert-europarl-en" --test
 ```
 
 ## Inference
-To use a trained model for inference you just need a dataset you want to create predictions for. The dataset shoul have a column-based format, the only required column
-is the one that stores the textual input. You can use the script *bert_predict_storytelling.py* to create predictions.
-Four fine-tuned classification models are made available via the hub. Alternatively you can first train your own model and use it for predictions.
+To use a trained model for inference you just need a dataset you want to create predictions for. The dataset should have a column-based format, the only required column is the one that stores the textual input. You can use the script *bert_predict_storytelling.py* to create predictions.
+Several fine-tuned classification models are made available via the hub. Alternatively you can first train your own model and use it for predictions.
 The following models can be used directly from the hub
 - falkne/storytelling-europolis-en
 - falkne/storytelling-regulationroom-en
 - falkne/storytelling-change-my-view-en
-- falkne/storytelling-mixed-domains-en
+- falkne/storytelling-mixed-domains-en*
   - This model was trained on all three available datasets. It is the most robust model if you work with diverse domains.
 - falkne/storytelling-LM-europarl-mixed-en
   - this model was trained on all available datasets. the underlying LM was fine-tuned on europarl. This model got the best results in the paper.
@@ -77,6 +76,6 @@ The data and the code for the linear regression analysis can be found in `regres
 
 
 
-
+## Reference
 [1] [Reports of personal experiences and stories in argumentation: datasets and analysis Neele Falk and Gabriella Lapesa.
 Proceedings of the 60th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). 2022.](https://aclanthology.org/2022.acl-long.379/)
