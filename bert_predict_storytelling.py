@@ -77,8 +77,11 @@ if __name__ == '__main__':
                        fix_length=512, pad_token=PAD_INDEX, unk_token=UNK_INDEX)
     fields = [(args.text_col, text_field)]
     test_set = pd.read_csv(args.test_data, sep="\t")
+    test_tsv = test_set[[args.text_col]]
+    test_tsv.to_csv("%s/reduced_test.tsv" % args.result_folder, sep="\t", index=False)
 
-    test = TabularDataset(path=args.test_data, format='TSV', fields=fields, skip_header=True)
+    test = TabularDataset(path="%s/reduced_test.tsv" % args.result_folder, format='TSV', fields=fields,
+                          skip_header=True)
     test_iter = Iterator(test, batch_size=16, device=device, train=False, shuffle=False, sort=False)
 
     print("loaded test dataset from %s" % args.test_data)
