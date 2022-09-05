@@ -53,6 +53,23 @@ to use the model trained on regulationroom:
 ```
 python bert_predict_storytelling.py datasets/splits/cmv_10splits/split0/test.tsv "post_text" 512 "falkne/storytelling-regulationroom-en" test_results/ 0 --gold_label_col "label"
 ```
+
+## Requirements
+
+The code is based on the following packages (package versions)
+
+- numpy              1.21.5
+- pandas             1.3.5
+- scikit-learn       1.0.2
+- scipy              1.7.3
+- sklearn            0.0
+- torch              1.10.2+cu113
+- torchaudio         0.10.2+cu113
+- torchtext          0.11.2
+- torchvision        0.11.3+cu113
+- tqdm               4.62.3
+- transformers       4.16.2
+
 ## Regression Analysis
 
 The data and the code for the linear regression analysis can be found in `regression_analysis`.
